@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import patay.ru.bmatch.exceptions.GameExpired;
@@ -18,6 +20,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/v1/game/")
@@ -52,11 +56,11 @@ public class GameController {
         LocalDateTime expirationDate = game.getExpirationDate();
         LocalDateTime now = LocalDateTime.now();
 
-        if(now.toEpochSecond(ZoneOffset.UTC) > expirationDate.toEpochSecond(ZoneOffset.UTC)){
+        if (now.toEpochSecond(ZoneOffset.UTC) > expirationDate.toEpochSecond(ZoneOffset.UTC)) {
             throw new GameExpired("Not able to connect to expired game");
         }
 
-        if(!game.getStatus().equals("waiting")){
+        if (!game.getStatus().equals("waiting")) {
             throw new GameExpired("The game is already on!");
         }
 
@@ -76,11 +80,11 @@ public class GameController {
         LocalDateTime expirationDate = game.getExpirationDate();
         LocalDateTime now = LocalDateTime.now();
 
-        if(now.toEpochSecond(ZoneOffset.UTC) > expirationDate.toEpochSecond(ZoneOffset.UTC)){
+        if (now.toEpochSecond(ZoneOffset.UTC) > expirationDate.toEpochSecond(ZoneOffset.UTC)) {
             throw new GameExpired("Not able to connect to expired game");
         }
 
-        if(!game.getStatus().equals("waiting")){
+        if (!game.getStatus().equals("waiting")) {
             throw new GameExpired("The game is already on!");
         }
 
@@ -89,5 +93,13 @@ public class GameController {
         gameRepository.save(game);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @MessageMapping("/connect")
+    @SendTo("/game/users")
+    public List<User> greeting(GamePlayers gamePlayers) throws ResourceNotFoundException {
+        Game game = gameRepository.findById(gamePlayers.getGameId()).orElseThrow(() -> new ResourceNotFoundException("Game not found for this id: " + gamePlayers.getGameId()));
+
+        return game.getPlayers() ;
     }
 }

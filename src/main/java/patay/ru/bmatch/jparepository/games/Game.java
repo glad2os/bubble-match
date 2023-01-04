@@ -24,7 +24,8 @@ public class Game {
     }
 
     @OneToMany(
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER
     )
     private List<User> players = new ArrayList<>();;
 
@@ -36,5 +37,4 @@ public class Game {
 
     @Column(name = "expirationDate", nullable = false)
     private LocalDateTime expirationDate;
-
 }

@@ -1,5 +1,6 @@
 package patay.ru.bmatch.jparepository.games;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,7 +28,7 @@ public class Game {
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER
     )
-    private List<User> players = new ArrayList<>();;
+    private List<User> players = new ArrayList<>();
 
     @Column(name = "status")
     private String status;
@@ -37,4 +38,8 @@ public class Game {
 
     @Column(name = "expirationDate", nullable = false)
     private LocalDateTime expirationDate;
+
+    @ElementCollection
+    @JsonIgnore
+    public List<Integer> area;
 }

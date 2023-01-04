@@ -1,31 +1,17 @@
 package patay.ru.bmatch.gamelogic.area;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public record Generator(Integer[] area) {
 
-    public static final Integer x = 10;
-    public static final Integer y = 10;
-
-    public static Integer[] generateArea() {
-        int areaLength = y * x;
-        Integer[] area = new Integer[areaLength];
-
-        int _tmpCounter = 1;
-
-        for (int i = 0; i < areaLength / 2; i++) {
-            area[i] = _tmpCounter;
-            area[99-i] = _tmpCounter;
-            _tmpCounter++;
-        }
-        List<Integer> list = new java.util.ArrayList<>(Arrays.stream(area).toList());
-
-        Collections.shuffle(list);
-
-
-        return  list.toArray(Integer[]::new);
+    public static List<Integer> generateArea() {
+        return IntStream.range(0, 50).flatMap(i -> IntStream.of(i, i)).boxed().collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
+            Collections.shuffle(list);
+            return list;
+        }));
     }
 }
 

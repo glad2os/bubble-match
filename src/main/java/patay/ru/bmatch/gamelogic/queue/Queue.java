@@ -1,6 +1,6 @@
 package patay.ru.bmatch.gamelogic.queue;
 
-import patay.ru.bmatch.users.User;
+import patay.ru.bmatch.jparepository.users.User;
 
 import java.util.List;
 

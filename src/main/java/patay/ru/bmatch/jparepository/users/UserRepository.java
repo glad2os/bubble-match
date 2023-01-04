@@ -1,4 +1,4 @@
-package patay.ru.bmatch.users;
+package patay.ru.bmatch.jparepository.users;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

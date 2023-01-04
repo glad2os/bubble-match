@@ -1,9 +1,11 @@
 package patay.ru.bmatch.controllers;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import patay.ru.bmatch.users.User;
-import patay.ru.bmatch.users.UserRepository;
+import patay.ru.bmatch.exceptions.ResourceNotFoundException;
+import patay.ru.bmatch.jparepository.users.User;
+import patay.ru.bmatch.jparepository.users.UserRepository;
 
 import java.util.List;
 
@@ -19,6 +21,12 @@ public class UserController {
     @GetMapping("/all")
     public List<User> getAllEmployees() {
         return userRepository.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getEmployeeById(@PathVariable(value = "id") Long userId) throws ResourceNotFoundException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found for this id: " + userId));
+        return ResponseEntity.ok().body(user);
     }
 
     @PostMapping("/create")

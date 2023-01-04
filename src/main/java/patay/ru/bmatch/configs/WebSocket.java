@@ -11,7 +11,10 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
+import org.xml.sax.ErrorHandler;
+import patay.ru.bmatch.exceptions.ErrorDetails;
 
+import java.util.Date;
 import java.util.Map;
 
 @Configuration

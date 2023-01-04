@@ -8,4 +8,5 @@ import lombok.RequiredArgsConstructor;
 public class GamePlayers {
     private Long userId;
     private Long gameId;
+    private String token;
 }

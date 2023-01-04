@@ -1,5 +1,10 @@
 package patay.ru.bmatch.controllers;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -14,13 +19,16 @@ import patay.ru.bmatch.jparepository.games.AvailableGames;
 import patay.ru.bmatch.jparepository.games.Game;
 import patay.ru.bmatch.jparepository.games.GamePlayers;
 import patay.ru.bmatch.jparepository.games.GameRepository;
+import patay.ru.bmatch.jparepository.users.Token;
 import patay.ru.bmatch.jparepository.users.User;
 import patay.ru.bmatch.jparepository.users.UserRepository;
 
+import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.TimeZone;
 
 @RestController
@@ -29,12 +37,13 @@ public class GameController {
 
     private final UserRepository userRepository;
     private final GameRepository gameRepository;
+    private final SecretKey key;
 
     public GameController(UserRepository userRepository, GameRepository gameRepository) {
         this.userRepository = userRepository;
         this.gameRepository = gameRepository;
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode("eiw8euDie8FahhooRee3aokai2lu1ia2caegu7kohloh6iex9ahFefei5shoogot2ofaetheexi0moh0Thahz4ea2iexooTh9omibieshaeQuouhohv2oegohm6ahdiepeat3oofeiceeshu6joow5Shoo5eechah6eeDohxei8Ehaic3gisai4oolaegair5ee2moh8uPiphirei6ieShaxeig3oorux9shu7via8mawooth5sooVohfiuthaif"));
     }
-
 
     @GetMapping("/all")
     public List<Game> getAllEmployees() {
@@ -136,11 +145,38 @@ public class GameController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+
+    @MessageMapping("/join")
+    @SendTo("/game/users")
+    public String joinServer(Token token) throws ResourceNotFoundException {
+
+
+        Jws<Claims> claimsJws = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token.getToken());
+
+        Optional<User> currentUser = userRepository.findById(Long.valueOf(claimsJws.getHeader().get("id").toString()));
+
+
+        return "";
+    }
+
     @MessageMapping("/connect")
     @SendTo("/game/users")
     public List<User> greeting(GamePlayers gamePlayers) throws ResourceNotFoundException {
-        Game game = gameRepository.findById(gamePlayers.getGameId()).orElseThrow(() -> new ResourceNotFoundException("Game not found for this id: " + gamePlayers.getGameId()));
+        try {
+            Game game = gameRepository.findById(gamePlayers.getGameId()).orElseThrow(() -> new ResourceNotFoundException("Game not found for this id: " + gamePlayers.getGameId()));
 
-        return game.getPlayers();
+            // TODO: time validation
+
+            if(game.getStatus() == "open"){
+                return game.getPlayers();
+            }
+
+        } catch (RuntimeException e){
+
+        }
+        return null;
     }
 }

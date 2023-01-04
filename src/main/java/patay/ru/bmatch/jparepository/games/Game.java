@@ -3,12 +3,12 @@ package patay.ru.bmatch.jparepository.games;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import patay.ru.bmatch.jparepository.users.User;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -27,4 +27,14 @@ public class Game {
             cascade = CascadeType.ALL
     )
     private List<User> players = new ArrayList<>();;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "created", nullable = false)
+    private LocalDateTime created;
+
+    @Column(name = "expirationDate", nullable = false)
+    private LocalDateTime expirationDate;
+
 }

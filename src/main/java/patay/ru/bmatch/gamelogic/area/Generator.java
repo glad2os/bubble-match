@@ -26,13 +26,6 @@ public record Generator(Integer[] area) {
 
 
         return  list.toArray(Integer[]::new);
-
-    }
-
-    public static void main(String[] args) {
-        Integer[] integers = generateArea();
-
-        System.out.println(1);
     }
 }
 

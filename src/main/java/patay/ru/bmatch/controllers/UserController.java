@@ -19,18 +19,18 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public List<User> getAllEmployees() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getEmployeeById(@PathVariable(value = "id") Long userId) throws ResourceNotFoundException {
+    public ResponseEntity<User> gerUserById(@PathVariable(value = "id") Long userId) throws ResourceNotFoundException {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found for this id: " + userId));
         return ResponseEntity.ok().body(user);
     }
 
     @PostMapping("/create")
-    public User createEmployee(@Validated @RequestBody User user) {
+    public User createUser(@Validated @RequestBody User user) {
         return userRepository.save(user);
     }
 }

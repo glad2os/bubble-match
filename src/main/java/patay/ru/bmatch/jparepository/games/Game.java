@@ -24,10 +24,7 @@ public class Game {
         this.id = id;
     }
 
-    @OneToMany(
-            cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER
-    )
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<User> players = new ArrayList<>();
 
     @Column(name = "status")

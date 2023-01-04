@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import patay.ru.bmatch.exceptions.GameExpiredException;
 import patay.ru.bmatch.exceptions.ResourceNotFoundException;
 import patay.ru.bmatch.gamelogic.area.Generator;
+import patay.ru.bmatch.jparepository.games.AvailableGames;
 import patay.ru.bmatch.jparepository.games.Game;
 import patay.ru.bmatch.jparepository.games.GamePlayers;
 import patay.ru.bmatch.jparepository.games.GameRepository;
@@ -18,6 +19,7 @@ import patay.ru.bmatch.jparepository.users.UserRepository;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/game/")
@@ -37,6 +39,26 @@ public class GameController {
         return gameRepository.findAll();
     }
 
+    @GetMapping("/search")
+    public List<AvailableGames> searchAvailableGames(TimeZone timezone) {
+        List<AvailableGames> availableGames = new ArrayList<>();
+
+        var waiting = gameRepository.findAllByExpirationDateGreaterThanAndStatusEquals(LocalDateTime.now(), "waiting").stream().limit(10);
+        waiting.forEach(game -> {
+
+            AvailableGames availableGame = new AvailableGames();
+            availableGame.setId(game.getId());
+            availableGame.setStatus(game.getStatus());
+            availableGame.setExpirationDate(game.getExpirationDate());
+            availableGame.setCreated(game.getCreated());
+            availableGame.setRegisteredPlayers(game.getPlayers().size());
+
+            availableGames.add(availableGame);
+        });
+
+        return availableGames;
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Game> gerUserById(@PathVariable(value = "id") Long gameId) throws ResourceNotFoundException {
         Game game = gameRepository.findById(gameId).orElseThrow(() -> new ResourceNotFoundException("Game not found for this id: " + gameId));
@@ -49,7 +71,7 @@ public class GameController {
         game.setStatus("waiting");
         game.setCreated(LocalDateTime.now());
         game.setExpirationDate(LocalDateTime.now().plusMinutes(5));
-        game.setArea( Generator.generateArea() );
+        game.setArea(Generator.generateArea());
         gameRepository.save(game);
 
         return new ResponseEntity<>(game, HttpStatus.CREATED);
@@ -65,7 +87,7 @@ public class GameController {
         LocalDateTime now = LocalDateTime.now();
 
         if (now.toEpochSecond(ZoneOffset.UTC) > expirationDate.toEpochSecond(ZoneOffset.UTC)) {
-            throw new GameExpiredException("Not able to connect to expired game");
+         //   throw new GameExpiredException("Not able to connect to expired game");
         }
 
         if (!game.getStatus().equals("waiting")) {
@@ -89,7 +111,7 @@ public class GameController {
         LocalDateTime now = LocalDateTime.now();
 
         if (now.toEpochSecond(ZoneOffset.UTC) > expirationDate.toEpochSecond(ZoneOffset.UTC)) {
-            throw new GameExpiredException("Not able to connect to expired game");
+        //    throw new GameExpiredException("Not able to connect to expired game");
         }
 
         if (!game.getStatus().equals("waiting")) {
@@ -108,6 +130,6 @@ public class GameController {
     public List<User> greeting(GamePlayers gamePlayers) throws ResourceNotFoundException {
         Game game = gameRepository.findById(gamePlayers.getGameId()).orElseThrow(() -> new ResourceNotFoundException("Game not found for this id: " + gamePlayers.getGameId()));
 
-        return game.getPlayers() ;
+        return game.getPlayers();
     }
 }

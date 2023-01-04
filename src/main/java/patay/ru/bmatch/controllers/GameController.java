@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import patay.ru.bmatch.exceptions.GameExpiredException;
 import patay.ru.bmatch.exceptions.ResourceNotFoundException;
+import patay.ru.bmatch.exceptions.UserAlreadyInGameException;
 import patay.ru.bmatch.gamelogic.area.Generator;
 import patay.ru.bmatch.jparepository.games.AvailableGames;
 import patay.ru.bmatch.jparepository.games.Game;
@@ -18,8 +19,9 @@ import patay.ru.bmatch.jparepository.users.UserRepository;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TimeZone;
 
 @RestController
 @RequestMapping("/api/v1/game/")
@@ -87,7 +89,7 @@ public class GameController {
         LocalDateTime now = LocalDateTime.now();
 
         if (now.toEpochSecond(ZoneOffset.UTC) > expirationDate.toEpochSecond(ZoneOffset.UTC)) {
-         //   throw new GameExpiredException("Not able to connect to expired game");
+            throw new GameExpiredException("Not able to connect to expired game");
         }
 
         if (!game.getStatus().equals("waiting")) {
@@ -95,6 +97,11 @@ public class GameController {
         }
 
         List<User> players = game.getPlayers();
+
+        if (players.contains(user)) {
+            throw new UserAlreadyInGameException("The user is already in game!");
+        }
+
         players.add(user);
 
         gameRepository.save(game);
@@ -111,14 +118,18 @@ public class GameController {
         LocalDateTime now = LocalDateTime.now();
 
         if (now.toEpochSecond(ZoneOffset.UTC) > expirationDate.toEpochSecond(ZoneOffset.UTC)) {
-        //    throw new GameExpiredException("Not able to connect to expired game");
+                throw new GameExpiredException("Not able to connect to expired game");
         }
 
         if (!game.getStatus().equals("waiting")) {
             throw new GameExpiredException("The game is already on!");
         }
 
-        game.getPlayers().remove(user);
+        List<User> players = game.getPlayers();
+        if (!players.contains(user)) {
+            throw new UserAlreadyInGameException("The user is not in the game!");
+        }
+        players.remove(user);
 
         gameRepository.save(game);
 

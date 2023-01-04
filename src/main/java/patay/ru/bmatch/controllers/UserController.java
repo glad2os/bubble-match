@@ -42,7 +42,6 @@ public class UserController {
         return ResponseEntity.ok().body(user);
     }
 
-
     @PostMapping("/token")
     public ResponseEntity<User> validateUserByToken(@Validated @RequestBody Token token) throws JwtException {
         Jws<Claims> claimsJws = Jwts.parserBuilder()

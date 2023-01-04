@@ -19,6 +19,12 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "current_game", nullable = true)
+    private Long current_game;
+
+    @Column(name = "status", nullable = true)
+    private String status;
+
     public User(String username) {
         this.username = username;
     }

@@ -1,8 +1,6 @@
 package patay.ru.bmatch.gamelogic.area;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class AreaBubbles {
 

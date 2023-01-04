@@ -1,11 +1,10 @@
 package patay.ru.bmatch.jparepository.users;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import patay.ru.bmatch.jparepository.games.Game;
-
-import java.util.Set;
 
 @Entity
 @Data
@@ -18,6 +17,9 @@ public class User {
     private Long id;
     @Column(name = "username", nullable = false)
     private String username;
+
+    @Column(name = "password", nullable = false)
+    private String password;
 
     public User(String username) {
         this.username = username;
